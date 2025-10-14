@@ -11,7 +11,7 @@ class Config:
     DATABASE_URL = os.environ.get('DATABASE_URL')
     if DATABASE_URL:
         # Render uses 'postgres://'; SQLAlchemy prefers 'postgresql://' for psycopg2
-        SQLALCHEMY_DATABASE_URI = DATABASE_URL.replace('postgres://', 'postgresql://')
+        SQLALCHEMY_DATABASE_URI = DATABASE_URL.replace('postgres://', 'postgresql+psycopg://')
     else:
         SQLALCHEMY_DATABASE_URI = 'sqlite:///portfolio.db'
     
