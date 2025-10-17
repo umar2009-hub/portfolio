@@ -1,548 +1,212 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login - Secure Access</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: #0a0a0a;
-            color: #ffffff;
-            min-height: 100vh;
-            overflow-x: hidden;
-            position: relative;
-        }
-
-        /* Animated Background */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at 20% 50%, rgba(120, 0, 255, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(0, 255, 255, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 40% 20%, rgba(255, 0, 128, 0.1) 0%, transparent 50%);
-            animation: gradientShift 15s ease infinite;
-            z-index: -1;
-        }
-
-        @keyframes gradientShift {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
-        }
-
-        /* Preloader */
-        #preloader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #0a0a0a;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            transition: opacity 0.5s ease, visibility 0.5s ease;
-        }
-
-        #preloader.hidden {
-            opacity: 0;
-            visibility: hidden;
-        }
-
-        .loader {
-            width: 80px;
-            height: 80px;
-            position: relative;
-        }
-
-        .loader::before,
-        .loader::after {
-            content: '';
-            position: absolute;
-            border-radius: 50%;
-            animation: pulse 2s ease-out infinite;
-        }
-
-        .loader::before {
-            width: 80px;
-            height: 80px;
-            border: 3px solid rgba(0, 255, 255, 0.3);
-            animation: pulse 2s ease-out infinite;
-        }
-
-        .loader::after {
-            width: 60px;
-            height: 60px;
-            border: 3px solid rgba(120, 0, 255, 0.5);
-            top: 10px;
-            left: 10px;
-            animation: pulse 2s ease-out infinite 0.3s;
-        }
-
-        @keyframes pulse {
-            0% {
-                transform: scale(0.8);
-                opacity: 1;
-            }
-            100% {
-                transform: scale(1.5);
-                opacity: 0;
-            }
-        }
-
-        /* Main Container */
-        .container {
-            animation: fadeInUp 0.8s ease;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Glass Card */
-        .glass-card {
-            background: rgba(20, 20, 30, 0.7);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 24px;
-            box-shadow: 
-                0 8px 32px rgba(0, 0, 0, 0.4),
-                0 0 60px rgba(120, 0, 255, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            padding: 3rem;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.4s ease;
-        }
-
-        .glass-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(120, 0, 255, 0.1) 0%, transparent 70%);
-            animation: rotateGlow 10s linear infinite;
-            pointer-events: none;
-        }
-
-        @keyframes rotateGlow {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .glass-card:hover {
-            border-color: rgba(0, 255, 255, 0.3);
-            box-shadow: 
-                0 12px 40px rgba(0, 0, 0, 0.5),
-                0 0 80px rgba(0, 255, 255, 0.2),
-                inset 0 1px 0 rgba(255, 255, 255, 0.15);
-            transform: translateY(-5px);
-        }
-
-        /* Title Styling */
-        h2 {
-            font-weight: 700;
-            font-size: 2.5rem;
-            background: linear-gradient(135deg, #00ffff 0%, #7700ff 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 1rem;
-            position: relative;
-            z-index: 1;
-        }
-
-        .subtitle {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 1rem;
-            font-weight: 300;
-            margin-bottom: 2rem;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Lock Icon */
-        .lock-icon {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 2rem;
-            position: relative;
-            z-index: 1;
-        }
-
-        .lock-icon svg {
-            width: 100%;
-            height: 100%;
-            filter: drop-shadow(0 0 20px rgba(0, 255, 255, 0.5));
-            animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        /* Form Styling */
-        .form-label {
-            color: rgba(255, 255, 255, 0.9);
-            font-weight: 500;
-            font-size: 0.95rem;
-            margin-bottom: 0.75rem;
-            position: relative;
-            z-index: 1;
-        }
-
-        .form-control {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            color: #ffffff;
-            padding: 0.9rem 1.2rem;
-            font-size: 1.1rem;
-            letter-spacing: 0.3rem;
-            text-align: center;
-            transition: all 0.3s ease;
-            position: relative;
-            z-index: 1;
-        }
-
-        .form-control:focus {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(0, 255, 255, 0.5);
-            box-shadow: 
-                0 0 0 3px rgba(0, 255, 255, 0.1),
-                0 0 30px rgba(0, 255, 255, 0.2),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            color: #ffffff;
-            outline: none;
-        }
-
-        .form-control::placeholder {
-            color: rgba(255, 255, 255, 0.3);
-            letter-spacing: normal;
-        }
-
-        /* Button Styling */
-        .btn-primary {
-            background: linear-gradient(135deg, #7700ff 0%, #00ffff 100%);
-            border: none;
-            border-radius: 12px;
-            padding: 0.9rem 2.5rem;
-            font-weight: 600;
-            font-size: 1.1rem;
-            color: #ffffff;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.4s ease;
-            box-shadow: 0 4px 15px rgba(120, 0, 255, 0.4);
-            z-index: 1;
-        }
-
-        .btn-primary::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #00ffff 0%, #ff00ff 100%);
-            transition: left 0.5s ease;
-            z-index: -1;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 25px rgba(0, 255, 255, 0.5);
-        }
-
-        .btn-primary:hover::before {
-            left: 0;
-        }
-
-        .btn-primary:active {
-            transform: translateY(0);
-        }
-
-        /* Alert Styling */
-        .alert {
-            background: rgba(255, 100, 100, 0.15);
-            border: 1px solid rgba(255, 100, 100, 0.3);
-            border-radius: 12px;
-            color: #ff6b6b;
-            padding: 1rem 1.2rem;
-            margin-bottom: 1.5rem;
-            animation: slideDown 0.4s ease;
-            position: relative;
-            z-index: 1;
-        }
-
-        .alert-success {
-            background: rgba(100, 255, 150, 0.15);
-            border-color: rgba(100, 255, 150, 0.3);
-            color: #64ffaa;
-        }
-
-        .alert-danger {
-            background: rgba(255, 100, 100, 0.15);
-            border-color: rgba(255, 100, 100, 0.3);
-            color: #ff6b6b;
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .btn-close {
-            filter: invert(1);
-            opacity: 0.7;
-        }
-
-        .btn-close:hover {
-            opacity: 1;
-        }
-
-        /* PIN Input Animation */
-        .pin-input-wrapper {
-            position: relative;
-            margin-bottom: 2rem;
-        }
-
-        .pin-dots {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 1rem;
-            position: relative;
-            z-index: 1;
-        }
-
-        .pin-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .form-control:focus ~ .pin-dots .pin-dot {
-            background: rgba(0, 255, 255, 0.6);
-            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .glass-card {
-                padding: 2rem 1.5rem;
-            }
-
-            h2 {
-                font-size: 2rem;
-            }
-
-            .lock-icon {
-                width: 60px;
-                height: 60px;
-            }
-        }
-
-        /* Particle Background Effect */
-        .particles {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: -1;
-        }
-
-        .particle {
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: rgba(0, 255, 255, 0.5);
-            border-radius: 50%;
-            animation: float-particle 15s infinite;
-        }
-
-        @keyframes float-particle {
-            0%, 100% {
-                transform: translate(0, 0);
-                opacity: 0;
-            }
-            10% {
-                opacity: 1;
-            }
-            90% {
-                opacity: 1;
-            }
-            100% {
-                transform: translate(100px, -1000px);
-                opacity: 0;
-            }
-        }
-    </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Admin Login — Dot-only PIN (No Numpad)</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'Poppins',sans-serif;
+    background:#0a0a0a;color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;
+  }
+  .card{
+    width:100%;max-width:420px;background:rgba(20,20,30,0.78);backdrop-filter:blur(14px);
+    border-radius:18px;padding:2.2rem;border:1px solid rgba(255,255,255,0.06);box-shadow:0 12px 40px rgba(0,0,0,0.6);
+  }
+  h2{font-size:1.9rem;background:linear-gradient(135deg,#00ffff,#7700ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.4rem}
+  .subtitle{color:rgba(255,255,255,0.72);font-weight:300;margin-bottom:1.25rem}
+  .pin-dots{display:flex;gap:18px;justify-content:center;margin:1.3rem 0}
+  .pin-dot{width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,0.14);transition:all .15s ease}
+  .pin-dot.filled{background:rgba(0,255,255,0.95);box-shadow:0 0 14px rgba(0,255,255,0.45);transform:scale(1.22)}
+  .helper{font-size:.9rem;color:rgba(255,255,255,0.45);text-align:center;margin-top:.8rem}
+  /* hide any form inputs visually and from layout, but keep accessible to JS */
+  .invisible-field{
+    position: absolute !important;
+    width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0);
+    border: 0; white-space: nowrap;
+  }
+</style>
 </head>
 <body>
-    <!-- Preloader -->
-    <div id="preloader">
-        <div class="loader"></div>
+  <div class="card" role="region" aria-labelledby="title">
+    <h2 id="title">Admin Access</h2>
+    <p class="subtitle">No on-screen numpad. Desktop: type with physical keyboard. Mobile: keyboard suppressed.</p>
+
+    <!-- Server-side flash area kept (template) -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Visible dots UI -->
+    <div class="pin-dots" id="pinDots" aria-hidden="false" aria-label="PIN entry status">
+      <div class="pin-dot" data-index="0"></div>
+      <div class="pin-dot" data-index="1"></div>
+      <div class="pin-dot" data-index="2"></div>
+      <div class="pin-dot" data-index="3"></div>
     </div>
 
-    <!-- Particle Background -->
-    <div class="particles" id="particles"></div>
+    <p class="helper">Type digits on a physical keyboard (desktop). Mobile keyboards are disabled on purpose.</p>
 
-    <div class="container my-5">
-        <div class="row justify-content-center">
-            <div class="col-md-6 col-lg-5">
-                <div class="glass-card">
-                    <!-- Lock Icon -->
-                    <div class="lock-icon">
-                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 2C9.243 2 7 4.243 7 7V10H6C4.897 10 4 10.897 4 12V20C4 21.103 4.897 22 6 22H18C19.103 22 20 21.103 20 20V12C20 10.897 19.103 10 18 10H17V7C17 4.243 14.757 2 12 2ZM9 7C9 5.346 10.346 4 12 4C13.654 4 15 5.346 15 7V10H9V7Z" fill="url(#lockGradient)"/>
-                            <circle cx="12" cy="15" r="2" fill="url(#lockGradient)"/>
-                            <defs>
-                                <linearGradient id="lockGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                    <stop offset="0%" style="stop-color:#00ffff;stop-opacity:1" />
-                                    <stop offset="100%" style="stop-color:#7700ff;stop-opacity:1" />
-                                </linearGradient>
-                            </defs>
-                        </svg>
-                    </div>
+    <!-- Actual form: hidden, non-focusable, readonly field so mobile keyboards won't open.
+         It still has name="pin" so server receives the value on submit. -->
+    <form id="pinForm" method="POST" action="{{ url_for('login') }}" novalidate>
+      <input
+        id="realPinField"
+        name="pin"
+        class="invisible-field"
+        aria-hidden="true"
+        autocomplete="off"
+        readonly
+        tabindex="-1"
+      />
+      <button id="submitBtn" type="submit" class="invisible-field">Submit</button>
+    </form>
+  </div>
 
-                    <div class="text-center">
-                        <h2>Admin Access</h2>
-                        <p class="subtitle">Enter your 4-digit PIN to access the dashboard</p>
+<script>
+/*
+ Behavior:
+  - No visible keypad anywhere.
+  - No focusable inputs -> mobile soft keyboard won't appear.
+  - Desktop: capture physical keyboard digits (0-9) and Backspace; fill internal PIN buffer and update dots.
+  - When 4 digits entered -> set hidden readonly input value and submit the form.
+  - Mobile: touch events that could focus inputs are prevented; physical keyboard on mobile (rare) may still work.
+*/
 
-                        {% with messages = get_flashed_messages(with_categories=true) %}
-                            {% if messages %}
-                                {% for category, message in messages %}
-                                    <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show" role="alert">
-                                        {{ message }}
-                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                                    </div>
-                                {% endfor %}
-                            {% endif %}
-                        {% endwith %}
+(function(){
+  const MAX = 4;
+  const pinDots = document.querySelectorAll('#pinDots .pin-dot');
+  const realPinField = document.getElementById('realPinField');
+  const form = document.getElementById('pinForm');
 
-                        <form method="POST" action="{{ url_for('login') }}">
-                            <div class="mb-3 pin-input-wrapper">
-                                <label for="pin" class="form-label">Security PIN</label>
-                                <input 
-                                    type="password" 
-                                    class="form-control" 
-                                    id="pin" 
-                                    name="pin" 
-                                    maxlength="4" 
-                                    required 
-                                    pattern="\d{4}" 
-                                    title="4-digit number"
-                                    placeholder="••••"
-                                    autocomplete="off"
-                                >
-                                <div class="pin-dots">
-                                    <div class="pin-dot"></div>
-                                    <div class="pin-dot"></div>
-                                    <div class="pin-dot"></div>
-                                    <div class="pin-dot"></div>
-                                </div>
-                            </div>
-                            <button type="submit" class="btn btn-primary w-100">
-                                Secure Login
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+  // detect "likely mobile" to change behavior slightly: on mobile we avoid reacting to touch-based virtual keyboards
+  const isMobile = (('ontouchstart' in window) || (navigator.maxTouchPoints && navigator.maxTouchPoints > 0))
+                   && Math.min(window.innerWidth, window.innerHeight) <= 900;
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Preloader
-        window.addEventListener('load', () => {
-            const preloader = document.getElementById('preloader');
-            setTimeout(() => {
-                preloader.classList.add('hidden');
-            }, 800);
-        });
+  // internal buffer
+  let buffer = '';
 
-        // Create floating particles
-        function createParticles() {
-            const particlesContainer = document.getElementById('particles');
-            const particleCount = 30;
+  // update dot visuals
+  function updateDots() {
+    pinDots.forEach((d, i) => d.classList.toggle('filled', i < buffer.length));
+  }
 
-            for (let i = 0; i < particleCount; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                particle.style.left = Math.random() * 100 + '%';
-                particle.style.animationDelay = Math.random() * 15 + 's';
-                particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
-                particlesContainer.appendChild(particle);
-            }
-        }
+  // push digit
+  function pushDigit(d) {
+    if (buffer.length >= MAX) return;
+    buffer += String(d).slice(0,1);
+    updateDots();
+    if (buffer.length === MAX) onComplete();
+  }
 
-        createParticles();
+  // pop (backspace)
+  function popDigit() {
+    if (buffer.length === 0) return;
+    buffer = buffer.slice(0, -1);
+    updateDots();
+  }
 
-        // PIN input animation
-        const pinInput = document.getElementById('pin');
-        const pinDots = document.querySelectorAll('.pin-dot');
+  // completion: set readonly hidden field and submit
+  function onComplete() {
+    // place in readonly hidden input (doesn't focus)
+    realPinField.value = buffer;
+    // Small UX pause to allow dot animation legibility
+    setTimeout(()=> {
+      // submit the form normally so server receives POST
+      form.submit();
+    }, 140);
+  }
 
-        pinInput.addEventListener('input', (e) => {
-            const length = e.target.value.length;
-            pinDots.forEach((dot, index) => {
-                if (index < length) {
-                    dot.style.background = 'rgba(0, 255, 255, 0.8)';
-                    dot.style.boxShadow = '0 0 15px rgba(0, 255, 255, 0.6)';
-                    dot.style.transform = 'scale(1.3)';
-                } else {
-                    dot.style.background = 'rgba(255, 255, 255, 0.2)';
-                    dot.style.boxShadow = 'none';
-                    dot.style.transform = 'scale(1)';
-                }
-            });
-        });
+  // keyboard handler: only for physical keyboards, not virtual mobile keyboards
+  // To avoid causing mobile keyboards to appear, do NOT focus any input on touch.
+  window.addEventListener('keydown', (ev) => {
+    // If mobile, skip handling to avoid surprises (most mobile devices won't have physical keyboard)
+    // But allow if a hardware keyboard is present and 'isMobile' false.
+    // We intentionally do not focus inputs anywhere.
+    if (isMobile) {
+      // On some mobile devices with hardware keyboards, users might still expect typing — allow only if hardware keyboard detected:
+      // Heuristic: presence of key events with isTrusted = true; that's not perfect but acceptable.
+      // We'll still ignore to honor "no numpad" demand.
+      return;
+    }
 
-        // Form submit animation
-        const form = document.querySelector('form');
-        form.addEventListener('submit', (e) => {
-            const button = form.querySelector('.btn-primary');
-            button.innerHTML = '<span style="opacity: 0.7;">Authenticating...</span>';
-            button.style.pointerEvents = 'none';
-        });
-    </script>
+    // ignore if modifier keys active (Ctrl/Alt/Meta) to avoid intercepting shortcuts
+    if (ev.ctrlKey || ev.altKey || ev.metaKey) return;
+
+    // allow digits and numpad digits
+    const key = ev.key;
+    if (/^[0-9]$/.test(key)) {
+      ev.preventDefault();
+      pushDigit(key);
+      return;
+    }
+    // Also support Numpad keys (some browsers report 'Numpad0' etc as ev.code)
+    if (ev.code && ev.code.startsWith('Numpad')) {
+      const n = ev.code.replace('Numpad','');
+      if (/^[0-9]$/.test(n)) {
+        ev.preventDefault();
+        pushDigit(n);
+        return;
+      }
+    }
+    // Backspace to delete
+    if (key === 'Backspace') {
+      ev.preventDefault();
+      popDigit();
+      return;
+    }
+    // Enter to attempt submit if buffer length is 4
+    if (key === 'Enter') {
+      if (buffer.length === MAX) {
+        ev.preventDefault();
+        onComplete();
+      }
+    }
+  }, {passive:false});
+
+  // Prevent any accidental focus from touch/click on mobile that could open soft keyboard:
+  document.addEventListener('touchstart', function(e){
+    // if the touch lands on an input/textarea, prevent it to suppress keyboard
+    const tgt = e.target;
+    if (tgt && (tgt.tagName === 'INPUT' || tgt.tagName === 'TEXTAREA' || tgt.isContentEditable)) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  }, {passive:false});
+
+  // Also prevent clicks focusing inputs
+  document.addEventListener('click', function(e){
+    const tgt = e.target;
+    if (tgt && (tgt.tagName === 'INPUT' || tgt.tagName === 'TEXTAREA')) {
+      // blur immediately to avoid keyboard triggers
+      tgt.blur && tgt.blur();
+    }
+  }, true);
+
+  // Clear buffer on page show to avoid persisted visual state
+  window.addEventListener('pageshow', () => {
+    buffer = '';
+    updateDots();
+    realPinField.value = '';
+  });
+
+  // expose a tiny debug hook on window for devs (optional)
+  window.__pin_debug = {
+    getBuffer: ()=>buffer,
+    clear: ()=>{ buffer=''; updateDots(); realPinField.value=''; }
+  };
+
+})();
+</script>
 </body>
 </html>
